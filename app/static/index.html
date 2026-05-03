@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gestion de bibliothèque</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <div>
+      <p class="eyebrow">SAE — API RESTful conteneurisée</p>
+      <h1>Gestion de bibliothèque</h1>
+    </div>
+    <div class="hero-actions">
+      <a class="button secondary" href="/docs" target="_blank">Ouvrir Swagger</a>
+      <button class="button" id="refreshAllBtn">Actualiser tout</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="stats-grid" aria-label="Statistiques">
+      <article class="stat-card">
+        <span class="stat-label">Auteurs</span>
+        <strong id="authorsCount">0</strong>
+      </article>
+      <article class="stat-card">
+        <span class="stat-label">Livres</span>
+        <strong id="booksCount">0</strong>
+      </article>
+      <article class="stat-card">
+        <span class="stat-label">Lecteurs</span>
+        <strong id="readersCount">0</strong>
+      </article>
+      <article class="stat-card">
+        <span class="stat-label">Emprunts actifs</span>
+        <strong id="activeBorrowsCount">0</strong>
+      </article>
+    </section>
+
+    <div id="alert" class="alert hidden" role="status"></div>
+
+    <nav class="tabs" aria-label="Sections">
+      <button class="tab active" data-tab="authors">Auteurs</button>
+      <button class="tab" data-tab="books">Livres</button>
+      <button class="tab" data-tab="readers">Lecteurs</button>
+      <button class="tab" data-tab="cards">Cartes</button>
+      <button class="tab" data-tab="borrows">Emprunts</button>
+      <button class="tab" data-tab="demo">Scénario démo</button>
+    </nav>
+
+    <section id="authors" class="panel active">
+      <div class="panel-header">
+        <div>
+          <h2>Auteurs</h2>
+          <p>Relation One-to-Many : un auteur peut avoir plusieurs livres.</p>
+        </div>
+        <button class="button secondary" data-refresh="authors">Rafraîchir</button>
+      </div>
+      <form id="authorForm" class="form-grid">
+        <input type="hidden" id="authorId" />
+        <label>Nom<input id="authorName" required placeholder="Victor Hugo" /></label>
+        <label>Nationalité<input id="authorNationality" placeholder="Française" /></label>
+        <label>Année de naissance<input id="authorBirthYear" type="number" placeholder="1802" /></label>
+        <div class="form-actions">
+          <button class="button" type="submit">Enregistrer</button>
+          <button class="button ghost" type="button" id="resetAuthorForm">Annuler</button>
+        </div>
+      </form>
+      <div class="table-wrapper"><table><thead><tr><th>ID</th><th>Nom</th><th>Nationalité</th><th>Naissance</th><th>Actions</th></tr></thead><tbody id="authorsTable"></tbody></table></div>
+    </section>
+
+    <section id="books" class="panel">
+      <div class="panel-header">
+        <div>
+          <h2>Livres</h2>
+          <p>Chaque livre appartient à un auteur. Le stock diminue lors d’un emprunt.</p>
+        </div>
+        <button class="button secondary" data-refresh="books">Rafraîchir</button>
+      </div>
+      <form id="bookForm" class="form-grid">
+        <input type="hidden" id="bookId" />
+        <label>Titre<input id="bookTitle" required placeholder="Les Misérables" /></label>
+        <label>ISBN<input id="bookIsbn" required placeholder="9782070409228" /></label>
+        <label>Année<input id="bookPublicationYear" type="number" placeholder="1862" /></label>
+        <label>Copies disponibles<input id="bookAvailableCopies" type="number" min="0" value="1" /></label>
+        <label>Auteur<select id="bookAuthorId" required></select></label>
+        <div class="form-actions">
+          <button class="button" type="submit">Enregistrer</button>
+          <button class="button ghost" type="button" id="resetBookForm">Annuler</button>
+        </div>
+      </form>
+      <div class="table-wrapper"><table><thead><tr><th>ID</th><th>Titre</th><th>ISBN</th><th>Année</th><th>Copies</th><th>Auteur</th><th>Actions</th></tr></thead><tbody id="booksTable"></tbody></table></div>
+    </section>
+
+    <section id="readers" class="panel">
+      <div class="panel-header">
+        <div>
+          <h2>Lecteurs</h2>
+          <p>Un lecteur peut emprunter plusieurs livres au fil du temps.</p>
+        </div>
+        <button class="button secondary" data-refresh="readers">Rafraîchir</button>
+      </div>
+      <form id="readerForm" class="form-grid">
+        <input type="hidden" id="readerId" />
+        <label>Prénom<input id="readerFirstName" required placeholder="Nadia" /></label>
+        <label>Nom<input id="readerLastName" required placeholder="Benali" /></label>
+        <label>Email<input id="readerEmail" type="email" required placeholder="nadia@example.com" /></label>
+        <div class="form-actions">
+          <button class="button" type="submit">Enregistrer</button>
+          <button class="button ghost" type="button" id="resetReaderForm">Annuler</button>
+        </div>
+      </form>
+      <div class="table-wrapper"><table><thead><tr><th>ID</th><th>Prénom</th><th>Nom</th><th>Email</th><th>Actions</th></tr></thead><tbody id="readersTable"></tbody></table></div>
+    </section>
+
+    <section id="cards" class="panel">
+      <div class="panel-header">
+        <div>
+          <h2>Cartes de bibliothèque</h2>
+          <p>Relation One-to-One : un lecteur possède une seule carte.</p>
+        </div>
+        <button class="button secondary" data-refresh="cards">Rafraîchir</button>
+      </div>
+      <form id="cardForm" class="form-grid">
+        <input type="hidden" id="cardId" />
+        <label>Numéro de carte<input id="cardNumber" required placeholder="CARD-003" /></label>
+        <label>Lecteur<select id="cardReaderId" required></select></label>
+        <div class="form-actions">
+          <button class="button" type="submit">Enregistrer</button>
+          <button class="button ghost" type="button" id="resetCardForm">Annuler</button>
+        </div>
+      </form>
+      <div class="table-wrapper"><table><thead><tr><th>ID</th><th>Numéro</th><th>Lecteur</th><th>Date création</th><th>Actions</th></tr></thead><tbody id="cardsTable"></tbody></table></div>
+    </section>
+
+    <section id="borrows" class="panel">
+      <div class="panel-header">
+        <div>
+          <h2>Emprunts</h2>
+          <p>Relation Many-to-Many : lecteurs et livres sont reliés par la table Borrow.</p>
+        </div>
+        <button class="button secondary" data-refresh="borrows">Rafraîchir</button>
+      </div>
+      <form id="borrowForm" class="form-grid">
+        <label>Lecteur<select id="borrowReaderId" required></select></label>
+        <label>Livre<select id="borrowBookId" required></select></label>
+        <div class="form-actions">
+          <button class="button" type="submit">Créer un emprunt</button>
+        </div>
+      </form>
+      <div class="table-wrapper"><table><thead><tr><th>ID</th><th>Lecteur</th><th>Livre</th><th>Date emprunt</th><th>Date retour</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="borrowsTable"></tbody></table></div>
+    </section>
+
+    <section id="demo" class="panel">
+      <div class="panel-header">
+        <div>
+          <h2>Scénario conseillé pour la soutenance</h2>
+          <p>Tu peux suivre ces étapes devant le professeur pour montrer les méthodes REST et les relations.</p>
+        </div>
+      </div>
+      <ol class="demo-list">
+        <li>Créer un auteur dans l’onglet <strong>Auteurs</strong>.</li>
+        <li>Créer un livre lié à cet auteur dans l’onglet <strong>Livres</strong>.</li>
+        <li>Créer un lecteur dans l’onglet <strong>Lecteurs</strong>.</li>
+        <li>Créer une carte pour ce lecteur dans l’onglet <strong>Cartes</strong>.</li>
+        <li>Créer un emprunt dans l’onglet <strong>Emprunts</strong>.</li>
+        <li>Retourner le livre avec le bouton <strong>Retourner</strong>.</li>
+        <li>Ouvrir <a href="/docs" target="_blank">Swagger</a> pour montrer l’API REST complète.</li>
+      </ol>
+      <div class="relation-boxes">
+        <div><strong>One-to-One</strong><span>Lecteur → Carte</span></div>
+        <div><strong>One-to-Many</strong><span>Auteur → Livres</span></div>
+        <div><strong>Many-to-Many</strong><span>Lecteur ↔ Livre via Emprunt</span></div>
+      </div>
+    </section>
+  </main>
+
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
