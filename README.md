@@ -1,7 +1,5 @@
 # Gestion de bibliothèque
 
-Projet réalisé dans le cadre de la SAE **Développement et Déploiement d’une Application Web RESTful Conteneurisée**.
-
 ## Auteurs
 
 - Daizer Bercy
