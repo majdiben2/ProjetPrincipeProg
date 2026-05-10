@@ -1,5 +1,7 @@
 # Gestion de bibliothèque
 
+Projet réalisé dans le cadre de la SAE **Développement et Déploiement d’une Application Web RESTful Conteneurisée**.
+
 ## Auteurs
 
 - Daizer Bercy
@@ -215,21 +217,6 @@ Exemple :
   "book_id": 1
 }
 ```
-
-## Démonstration conseillée
-
-Pour la soutenance, on peut suivre ce scénario :
-
-1. Lancer le projet avec Docker Compose.
-2. Ouvrir l’interface web sur `http://localhost:8000`.
-3. Créer un auteur.
-4. Créer un livre lié à cet auteur.
-5. Créer un lecteur.
-6. Créer une carte pour ce lecteur.
-7. Créer un emprunt.
-8. Retourner le livre.
-9. Ouvrir Swagger pour montrer toutes les routes REST.
-
 
 ## Persistance des données
 
