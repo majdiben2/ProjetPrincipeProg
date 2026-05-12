@@ -14,6 +14,7 @@ def lister_livres(session: Session = Depends(get_db)):
 
 @router.get("/available", response_model=list[schemas.BookResponse])
 def lister_livres_disponibles(session: Session = Depends(get_db)):
+    # Cette route sert à afficher uniquement les livres qu'on peut encore emprunter.
     return (
         session.query(models.Book)
         .filter(models.Book.available_copies > 0)
@@ -32,15 +33,17 @@ def recuperer_livre(livre_id: int, session: Session = Depends(get_db)):
 
 @router.post("", response_model=schemas.BookResponse, status_code=status.HTTP_201_CREATED)
 def creer_livre(donnees: schemas.BookCreate, session: Session = Depends(get_db)):
+    # On vérifie d'abord que l'auteur existe pour respecter la clé étrangère.
     auteur = session.get(models.Author, donnees.author_id)
     if not auteur:
         raise HTTPException(status_code=404, detail="Auteur introuvable")
 
+    # L'ISBN doit rester unique pour éviter deux fiches pour le même livre.
     livre_existant = session.query(models.Book).filter(models.Book.isbn == donnees.isbn).first()
     if livre_existant:
         raise HTTPException(status_code=409, detail="Un livre avec cet ISBN existe déjà")
 
-    livre = models.Book(**donnees.model_dump())
+    livre = models.Book(**donnees.model_dump()) # transforme les données Pydantic en dictionnaire Python.
     session.add(livre)
     session.commit()
     session.refresh(livre)
@@ -55,9 +58,11 @@ def modifier_livre(livre_id: int, donnees: schemas.BookUpdate, session: Session 
 
     modifications = donnees.model_dump(exclude_unset=True)
 
+    # Si on change l'auteur, le nouvel auteur doit déjà exister.
     if "author_id" in modifications and not session.get(models.Author, modifications["author_id"]):
         raise HTTPException(status_code=404, detail="Auteur introuvable")
 
+    # On exclut le livre actuel de la recherche pour autoriser la conservation du même ISBN.
     if "isbn" in modifications:
         livre_existant = (
             session.query(models.Book)
@@ -81,6 +86,7 @@ def supprimer_livre(livre_id: int, session: Session = Depends(get_db)):
     if not livre:
         raise HTTPException(status_code=404, detail="Livre introuvable")
 
+    # Les emprunts liés au livre sont supprimés par cascade dans le modèle.
     session.delete(livre)
     session.commit()
     return {"message": "Livre supprimé"}

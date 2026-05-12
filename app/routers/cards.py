@@ -22,13 +22,16 @@ def recuperer_carte(carte_id: int, session: Session = Depends(get_db)):
 
 @router.post("", response_model=schemas.LibraryCardResponse, status_code=status.HTTP_201_CREATED)
 def creer_carte(donnees: schemas.LibraryCardCreate, session: Session = Depends(get_db)):
+    # La carte doit obligatoirement être associée à un lecteur existant.
     lecteur = session.get(models.Reader, donnees.reader_id)
     if not lecteur:
         raise HTTPException(status_code=404, detail="Lecteur introuvable")
 
+    # Relation one-to-one : un lecteur ne peut avoir qu'une seule carte.
     if lecteur.card:
         raise HTTPException(status_code=409, detail="Ce lecteur possède déjà une carte")
 
+    # Le numéro de carte est unique dans toute la bibliothèque.
     numero_existant = (
         session.query(models.LibraryCard)
         .filter(models.LibraryCard.card_number == donnees.card_number)
@@ -52,6 +55,7 @@ def modifier_carte(carte_id: int, donnees: schemas.LibraryCardUpdate, session: S
 
     modifications = donnees.model_dump(exclude_unset=True)
     if "card_number" in modifications:
+        # On vérifie que le nouveau numéro n'est pas déjà utilisé par une autre carte.
         numero_existant = (
             session.query(models.LibraryCard)
             .filter(
@@ -67,6 +71,7 @@ def modifier_carte(carte_id: int, donnees: schemas.LibraryCardUpdate, session: S
         lecteur = session.get(models.Reader, modifications["reader_id"])
         if not lecteur:
             raise HTTPException(status_code=404, detail="Lecteur introuvable")
+        # Même en modification, on conserve la règle : une seule carte par lecteur.
         carte_existante = (
             session.query(models.LibraryCard)
             .filter(

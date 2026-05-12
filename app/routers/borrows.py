@@ -24,6 +24,7 @@ def recuperer_emprunt(emprunt_id: int, session: Session = Depends(get_db)):
 
 @router.post("", response_model=schemas.BorrowResponse, status_code=status.HTTP_201_CREATED)
 def creer_emprunt(donnees: schemas.BorrowCreate, session: Session = Depends(get_db)):
+    # Un emprunt n'est valide que si le lecteur et le livre existent.
     lecteur = session.get(models.Reader, donnees.reader_id)
     if not lecteur:
         raise HTTPException(status_code=404, detail="Lecteur introuvable")
@@ -32,10 +33,12 @@ def creer_emprunt(donnees: schemas.BorrowCreate, session: Session = Depends(get_
     if not livre:
         raise HTTPException(status_code=404, detail="Livre introuvable")
 
+    # La création d'un emprunt dépend du stock disponible.
     if livre.available_copies <= 0:
         raise HTTPException(status_code=400, detail="Aucune copie disponible pour ce livre")
 
     emprunt = models.Borrow(reader_id=donnees.reader_id, book_id=donnees.book_id)
+    # Le stock est décrémenté dans la même transaction que la création de l'emprunt.
     livre.available_copies -= 1
 
     session.add(emprunt)
@@ -53,6 +56,7 @@ def retourner_livre(emprunt_id: int, session: Session = Depends(get_db)):
     if emprunt.status == "returned":
         raise HTTPException(status_code=400, detail="Ce livre a déjà été retourné")
 
+    # Le retour du livre met à jour l'emprunt et rend une copie disponible.
     emprunt.status = "returned"
     emprunt.return_date = datetime.utcnow()
     emprunt.book.available_copies += 1
@@ -68,6 +72,7 @@ def modifier_emprunt(emprunt_id: int, donnees: schemas.BorrowUpdate, session: Se
     if not emprunt:
         raise HTTPException(status_code=404, detail="Emprunt introuvable")
 
+    # Cette route permet une modification manuelle du statut ou de la date de retour.
     modifications = donnees.model_dump(exclude_unset=True)
     for champ, valeur in modifications.items():
         setattr(emprunt, champ, valeur)
@@ -83,6 +88,7 @@ def supprimer_emprunt(emprunt_id: int, session: Session = Depends(get_db)):
     if not emprunt:
         raise HTTPException(status_code=404, detail="Emprunt introuvable")
 
+    # Si l'emprunt était encore actif, on corrige le stock avant suppression.
     if emprunt.status == "borrowed":
         emprunt.book.available_copies += 1
 

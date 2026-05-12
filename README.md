@@ -78,7 +78,6 @@ library-api-web/
 ├── Dockerfile
 ├── docker-compose.yml
 ├── requirements.txt
-├── sample_data.sql
 └── README.md
 ```
 
