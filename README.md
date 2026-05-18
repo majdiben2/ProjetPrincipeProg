@@ -85,6 +85,11 @@ library-api-web/
 
 Il faut avoir Docker installé sur la machine.
 
+Cloner le dépôt :
+```bash
+git clone https://github.com/majdiben2/ProjetPrincipeProg.git
+cd ProjetPrincipeProg
+```
 Depuis le dossier du projet :
 
 ```bash
