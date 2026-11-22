@@ -1,17 +1,30 @@
+
+![Python](https://img.shields.io/badge/Python-3.x-3776AB?logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-REST%20API-009688?logo=fastapi&logoColor=white)
+![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-ORM-D71F00?logo=sqlalchemy&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-4169E1?logo=postgresql&logoColor=white)
+![HTML5](https://img.shields.io/badge/HTML5-Frontend-E34F26?logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-Styling-1572B6?logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-Frontend-F7DF1E?logo=javascript&logoColor=black)
+![Swagger](https://img.shields.io/badge/Swagger-API%20Documentation-85EA2D?logo=swagger&logoColor=black)
+![Docker](https://img.shields.io/badge/Docker-Containerization-2496ED?logo=docker&logoColor=white)
+![Docker Compose](https://img.shields.io/badge/Docker%20Compose-Orchestration-2496ED?logo=docker&logoColor=white)
+
 # Gestion de bibliothèque
 
 Projet réalisé dans le cadre de la SAE **Développement et Déploiement d’une Application Web RESTful Conteneurisée**.
-
-## Auteurs
-
-- Daizer Bercy
-- Ben Younes Majdi
 
 ## Présentation
 
 Ce projet est une application de gestion de bibliothèque. Elle permet de gérer les auteurs, les livres, les lecteurs, les cartes de bibliothèque et les emprunts.
 
 L’application contient une API REST avec FastAPI et une petite interface web pour rendre la démonstration plus simple pendant la soutenance.
+
+## Démonstration
+
+Voici une démonstration :
+
+https://github.com/user-attachments/assets/a3db067a-ffe8-4f48-b381-5bd0cd54fccf
 
 ## Technologies utilisées
 
@@ -237,3 +250,8 @@ Puis relancer :
 ```bash
 docker compose up --build
 ```
+
+## Auteurs
+
+- Ben Younes Majdi
+- Daizer Bercy
